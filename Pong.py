@@ -76,9 +76,9 @@ ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
 #Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
 score1 = 0
-score2 = 10
-gameScore1 = 2
-gameScore2 = 1
+score2 = 0
+gameScore1 = 0
+gameScore2 = 0
 
 #adds to sprite list
 sprite_list = pygame.sprite.Group()
@@ -100,6 +100,9 @@ MOVESPEED = 10
 #plays background music
 pygame.mixer.music.load('music/Peace And Tranquility.mp3')
 pygame.mixer.music.play()
+pointSound = pygame.mixer.Sound("sounds/UMU.mp3")
+gameWonMusic = pygame.mixer.Sound("sounds/Victory Fanfare.mp3")
+gameLostMusic = pygame.mixer.Sound("sounds/Balamb Garden.mp3")
 
 #loser and winner text
 LoseWinSize = pygame.font.Font(None, 74)
@@ -135,12 +138,14 @@ while GameRunning:
         score1 += 1
         if score1 >= 11 and (score1 - 2) >= score2:
             gameScore1 += 1
+            pointSound.play()
             score1 = 0
             score2 = 0
             if gameScore1 == 3:
                 AIWin = True
                 # Asks the loser if they want to play again
                 windowSurface.blit(losertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                gameLostMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
                 pygame.display.flip() #updates the screen to show the text
@@ -161,12 +166,14 @@ while GameRunning:
         score2 += 1
         if score2 >= 11 and (score2 - 2) >= score1:
             gameScore2 += 1
+            pointSound.play()
             score1 = 0
             score2 = 0
             if gameScore2 == 3:
                 AIWin = True
                 # Asks the loser if they want to play again
                 windowSurface.blit(winnertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                gameWonMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
                 pygame.display.flip()  # updates the screen to show the text
