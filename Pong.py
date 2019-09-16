@@ -11,7 +11,7 @@ mainClock = pygame.time.Clock()
 
 #Sets up the window
 WINDOWWIDTH = 800
-WINDOWHEIGHT = 400
+WINDOWHEIGHT = 500
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption('Pong With No Walls')
 
@@ -50,27 +50,35 @@ class Ball(pygame.sprite.Sprite):
         ball.rect.x = (WINDOWWIDTH / 2) - 10
         ball.rect.y = (WINDOWHEIGHT / 2) - 10
         self.velocity = [horizontal, vertical]
-        moveBall = False
 
 #Sound files
 _Sound = ['sounds/blip1.wav', 'sounds/blip2.wav', 'sounds/blip3.wav']
 #Set up the player and ball
 AI = pygame.Rect(10, (WINDOWHEIGHT/2) - 50, 10, 100)
+AIimage = pygame.image.load('images/AIpaddle.png')
+AIStretchedimage = pygame.transform.scale(AIimage, (10, 100))
 AITop = pygame.Rect(150, 10, 100, 10)
+AITBimage = pygame.image.load('images/AIpaddle.png')
+AIStretchedTBimage = pygame.transform.scale(AITBimage, (100, 10))
 AIBottom = pygame.Rect(150, WINDOWHEIGHT - 20, 100, 10)
 #Player
 player1 = pygame.Rect(WINDOWWIDTH - 20, (WINDOWHEIGHT/2) - 50, 10, 100)
+player1image = pygame.image.load('images/playerPaddle.png')
+player1StretchedImage = pygame.transform.scale(player1image, (10, 100))
 player1Top = pygame.Rect(WINDOWWIDTH - 250, 10, 100, 10)
+player1TBimage = pygame.image.load('images/playerTB.png')
+player1StretchedTBImage = pygame.transform.scale(player1TBimage, (100, 10))
 player1Bottom = pygame.Rect(WINDOWWIDTH - 250, WINDOWHEIGHT - 20, 100, 10)
+
 #Ball
 ball = Ball(WHITE, 10, 10)
 ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
 #Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
 score1 = 0
-score2 = 0
-gameScore1 = 0
-gameScore2 = 0
+score2 = 10
+gameScore1 = 2
+gameScore2 = 1
 
 #adds to sprite list
 sprite_list = pygame.sprite.Group()
@@ -92,6 +100,14 @@ MOVESPEED = 10
 #plays background music
 pygame.mixer.music.load('music/Peace And Tranquility.mp3')
 pygame.mixer.music.play()
+
+#loser and winner text
+LoseWinSize = pygame.font.Font(None, 74)
+losertext = LoseWinSize.render("You Lost!",1, WHITE)
+winnertext = LoseWinSize.render("You Won!", 1, WHITE)
+continueFont = pygame.font.Font(None, 30)
+playAgain = continueFont.render("Would you like to play again?", 1, WHITE)
+instructionText = continueFont.render("Press Y to continue or Esc to quit", 1, WHITE)
 
 #Run the game loop
 GameRunning = True
@@ -122,9 +138,21 @@ while GameRunning:
             score1 = 0
             score2 = 0
             if gameScore1 == 3:
-                font = pygame.font.Font(None, 74)
-                text = font.render("Would you like to play again?\nPress Y to continue or Esc to quit.", 1, WHITE)
-                windowSurface.blit(text, (WINDOWWIDTH / 2 - 10, WINDOWHEIGHT/2))
+                AIWin = True
+                # Asks the loser if they want to play again
+                windowSurface.blit(losertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
+                windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
+                pygame.display.flip() #updates the screen to show the text
+                while AIWin:
+                    for event in pygame.event.get():
+                        if event.type == KEYDOWN and event.key == K_y:
+                            gameScore1 = 0
+                            gameScore2 = 0
+                            AIWin = False
+                        elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                            GameRunning = False
+                            sys.exit()
         ball.resetball1(randint(-8, -1), randint(-8,8))
 
     # player2 score
@@ -136,9 +164,21 @@ while GameRunning:
             score1 = 0
             score2 = 0
             if gameScore2 == 3:
-                font = pygame.font.Font(None, 74)
-                text = font.render("Would you like to play again?\nPress Y to continue or Esc to quit.", 1, WHITE)
-                windowSurface.blit(text, (WINDOWWIDTH / 2 - 10, WINDOWHEIGHT/2))
+                AIWin = True
+                # Asks the loser if they want to play again
+                windowSurface.blit(winnertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
+                windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
+                pygame.display.flip()  # updates the screen to show the text
+                while AIWin:
+                    for event in pygame.event.get():
+                        if event.type == KEYDOWN and event.key == K_y:
+                            gameScore1 = 0
+                            gameScore2 = 0
+                            AIWin = False
+                        elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                            GameRunning = False
+                            sys.exit()
         ball.resetball1(randint(1, 8), randint(-8,8))
 
     for event in pygame.event.get():
@@ -247,20 +287,30 @@ while GameRunning:
         player1Bottom.right += MOVESPEED
 
     #Draw the player onto surface
-    pygame.draw.rect(windowSurface, WHITE, AI)
-    pygame.draw.rect(windowSurface, WHITE, AITop)
-    pygame.draw.rect(windowSurface, WHITE, AIBottom)
-    pygame.draw.rect(windowSurface, WHITE, player1)
-    pygame.draw.rect(windowSurface, WHITE, player1Top)
-    pygame.draw.rect(windowSurface, WHITE, player1Bottom)
+    windowSurface.blit(AIStretchedimage, AI)
+    windowSurface.blit(AIStretchedTBimage, AITop)
+    windowSurface.blit(AIStretchedTBimage, AIBottom)
+    windowSurface.blit(player1StretchedImage, player1)
+    windowSurface.blit(player1StretchedTBImage, player1Top)
+    windowSurface.blit(player1StretchedTBImage, player1Bottom)
     pygame.draw.rect(windowSurface, WHITE, ball)
 
     # Display scores:
-    font = pygame.font.Font(None, 74)
-    text = font.render(str(score1), 1, WHITE)
-    windowSurface.blit(text, (WINDOWWIDTH/2 - 80, 10))
-    text = font.render(str(score2), 1, WHITE)
-    windowSurface.blit(text, (WINDOWWIDTH/2 + 50, 10))
+    font = pygame.font.Font(None, 60)
+    scoreMessage = font.render(str(score1), 1, WHITE)
+    windowSurface.blit(scoreMessage, (WINDOWWIDTH/2 - 80, 10))
+    scoreMessage2 = font.render(str(score2), 1, WHITE)
+    windowSurface.blit(scoreMessage2, (WINDOWWIDTH/2 + 50, 10))
+    score1Message = font.render(".", 1, WHITE)
+    score2Message = font.render("..", 1, WHITE)
+    if gameScore1 == 1:
+        windowSurface.blit(score1Message, (WINDOWWIDTH/2 - 40, 10))
+    elif gameScore1 == 2:
+        windowSurface.blit(score2Message, (WINDOWWIDTH/2 - 40, 10))
+    if gameScore2 == 1:
+        windowSurface.blit(score1Message, (WINDOWWIDTH/2 + 10, 10))
+    elif gameScore2 == 2:
+        windowSurface.blit(score2Message, (WINDOWWIDTH/2 + 10, 10))
 
     #Draw the net
     pygame.draw.line(windowSurface, WHITE, [(WINDOWWIDTH/2) - 1, 0], [(WINDOWWIDTH/2) - 1, WINDOWHEIGHT])
