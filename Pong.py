@@ -119,18 +119,25 @@ while GameRunning:
     sprite_list.update()
 
     # AI controls the paddle
-    if ball.rect.y < AI.top:
+    if ball.rect.y + 50 < AI.centery:
         move1Up = True
         move1Down = False
-    elif ball.rect.y > AI.bottom:
+    elif ball.rect.y + 50 > AI.centery:
         move1Up = False
         move1Down = True
-    if ball.rect.x < AITop.left:
+    else:
+        move1Up = False
+        move1Down = False
+    if (ball.rect.x, ball.rect.y) < AITop.midleft:
         move1Left = True
         move1Right = False
-    elif ball.rect.x > AITop.right:
+    elif (ball.rect.x, ball.rect.y) > AITop.midright:
         move1Left = False
         move1Right = True
+    else:
+        move1Left = False
+        move1Right = False
+
 
     # Detect collisions between the ball and the paddles
     if AI.colliderect(ball) or player1.colliderect(ball):
