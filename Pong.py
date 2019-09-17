@@ -71,14 +71,16 @@ player1StretchedTBImage = pygame.transform.scale(player1TBimage, (100, 10))
 player1Bottom = pygame.Rect(WINDOWWIDTH - 250, WINDOWHEIGHT - 20, 100, 10)
 
 #Ball
-ball = Ball(WHITE, 10, 10)
+ball = Ball(WHITE, 30, 30)
+ballimage = pygame.image.load('images/kirby.png').convert_alpha()
+ballStretchedimage = pygame.transform.scale(ballimage, (30, 30))
 ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
 #Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
 score1 = 0
-score2 = 10
-gameScore1 = 2
-gameScore2 = 2
+score2 = 0
+gameScore1 = 0
+gameScore2 = 0
 
 #adds to sprite list
 sprite_list = pygame.sprite.Group()
@@ -158,7 +160,8 @@ while GameRunning:
                         if event.type == KEYDOWN and event.key == K_y:
                             gameScore1 = 0
                             gameScore2 = 0
-                            pygame.mixer.music.start()
+                            gameLostMusic.stop()
+                            pygame.mixer.music.rewind()
                             AIWin = False
                         elif event.type == KEYDOWN and event.key == K_ESCAPE:
                             GameRunning = False
@@ -194,7 +197,8 @@ while GameRunning:
                         if event.type == KEYDOWN and event.key == K_y:
                             gameScore1 = 0
                             gameScore2 = 0
-                            pygame.mixer.music.start()
+                            gameWonMusic.stop()
+                            pygame.mixer.music.rewind()
                             AIWin = False
                         elif event.type == KEYDOWN and event.key == K_ESCAPE:
                             GameRunning = False
@@ -317,7 +321,8 @@ while GameRunning:
     windowSurface.blit(player1StretchedImage, player1)
     windowSurface.blit(player1StretchedTBImage, player1Top)
     windowSurface.blit(player1StretchedTBImage, player1Bottom)
-    pygame.draw.rect(windowSurface, WHITE, ball)
+    windowSurface.blit(ballStretchedimage, ball)
+
 
     # Display scores:
     font = pygame.font.Font(None, 60)
