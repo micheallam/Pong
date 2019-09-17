@@ -76,9 +76,9 @@ ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
 #Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
 score1 = 0
-score2 = 0
-gameScore1 = 0
-gameScore2 = 0
+score2 = 10
+gameScore1 = 2
+gameScore2 = 2
 
 #adds to sprite list
 sprite_list = pygame.sprite.Group()
@@ -100,9 +100,6 @@ MOVESPEED = 10
 #plays background music
 pygame.mixer.music.load('music/Peace And Tranquility.mp3')
 pygame.mixer.music.play()
-pointSound = pygame.mixer.Sound("sounds/UMU.mp3")
-gameWonMusic = pygame.mixer.Sound("sounds/Victory Fanfare.mp3")
-gameLostMusic = pygame.mixer.Sound("sounds/Balamb Garden.mp3")
 
 #loser and winner text
 LoseWinSize = pygame.font.Font(None, 74)
@@ -136,15 +133,22 @@ while GameRunning:
     if ball.rect.x >= WINDOWWIDTH - 10 or ball.rect.y <= 10 and ball.rect.x > WINDOWWIDTH / 2 or \
             ball.rect.y >= WINDOWHEIGHT - 10 and ball.rect.x > WINDOWWIDTH / 2:
         score1 += 1
+        if (score1 - 1) <= score2 or (score1 - 1) >= score2:
+            pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
+            pointSound.play()
         if score1 >= 11 and (score1 - 2) >= score2:
             gameScore1 += 1
-            pointSound.play()
+            if gameScore1 < 3:
+                gamePointSound = pygame.mixer.Sound("sounds/padoru.ogg")
+                gamePointSound.play()
             score1 = 0
             score2 = 0
             if gameScore1 == 3:
                 AIWin = True
                 # Asks the loser if they want to play again
                 windowSurface.blit(losertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                gameLostMusic = pygame.mixer.Sound("sounds/Balamb Garden.ogg")
+                pygame.mixer.music.pause()
                 gameLostMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
@@ -154,6 +158,7 @@ while GameRunning:
                         if event.type == KEYDOWN and event.key == K_y:
                             gameScore1 = 0
                             gameScore2 = 0
+                            pygame.mixer.music.start()
                             AIWin = False
                         elif event.type == KEYDOWN and event.key == K_ESCAPE:
                             GameRunning = False
@@ -164,15 +169,22 @@ while GameRunning:
     if ball.rect.x <= 10 or ball.rect.y >= WINDOWHEIGHT - 10 and ball.rect.x < WINDOWWIDTH / 2 or \
             ball.rect.y <= 10 and ball.rect.x < WINDOWWIDTH / 2:
         score2 += 1
+        if (score2 - 1) <= score1 or (score2 - 1) >= score1:
+            pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
+            pointSound.play()
         if score2 >= 11 and (score2 - 2) >= score1:
             gameScore2 += 1
-            pointSound.play()
+            if gameScore2 < 3:
+                gamePointSound = pygame.mixer.Sound("sounds/padoru.ogg")
+                gamePointSound.play()
             score1 = 0
             score2 = 0
             if gameScore2 == 3:
                 AIWin = True
                 # Asks the loser if they want to play again
                 windowSurface.blit(winnertext, (WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50))
+                pygame.mixer.music.pause()
+                gameWonMusic = pygame.mixer.Sound("sounds/Victory Fanfare.ogg")
                 gameWonMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
@@ -182,6 +194,7 @@ while GameRunning:
                         if event.type == KEYDOWN and event.key == K_y:
                             gameScore1 = 0
                             gameScore2 = 0
+                            pygame.mixer.music.start()
                             AIWin = False
                         elif event.type == KEYDOWN and event.key == K_ESCAPE:
                             GameRunning = False
@@ -218,11 +231,13 @@ while GameRunning:
             if event.key ==K_w:
                 move1Up = True
                 move1Down = False
+            if event.key == K_a:
                 move1Left = True
                 move1Right = False
             if event.key ==K_s:
                 move1Up = False
                 move1Down = True
+            if event.key == K_d:
                 move1Left = False
                 move1Right = True
 
@@ -243,9 +258,11 @@ while GameRunning:
             #player 1
             if event.key == K_w:
                 move1Up = False
+            if event.key == K_a:
                 move1Left = False
             if event.key == K_s:
                 move1Down = False
+            if event.key == K_d:
                 move1Right = False
 
             #player 2
