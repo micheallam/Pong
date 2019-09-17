@@ -30,7 +30,7 @@ class Ball(pygame.sprite.Sprite):
 
         #draw the ball
         pygame.draw.rect(self.image, color, [0, 0, width, height])
-        self.velocity = [randint(4, 8), randint(4, 8)]
+        self.velocity = [randint(-8, 8), randint(-8, 8)]
 
         self.rect = self.image.get_rect()
 
@@ -53,6 +53,7 @@ class Ball(pygame.sprite.Sprite):
 
 #Sound files
 _Sound = ['sounds/blip1.wav', 'sounds/blip2.wav', 'sounds/blip3.wav']
+
 #Set up the player and ball
 AI = pygame.Rect(10, (WINDOWHEIGHT/2) - 50, 10, 100)
 AIimage = pygame.image.load('images/AIpaddle.png')
@@ -69,7 +70,6 @@ player1Top = pygame.Rect(WINDOWWIDTH - 250, 10, 100, 10)
 player1TBimage = pygame.image.load('images/playerTB.png')
 player1StretchedTBImage = pygame.transform.scale(player1TBimage, (100, 10))
 player1Bottom = pygame.Rect(WINDOWWIDTH - 250, WINDOWHEIGHT - 20, 100, 10)
-
 #Ball
 ball = Ball(WHITE, 22, 22)
 ballimage = pygame.image.load('images/kirby.png').convert_alpha()
@@ -96,7 +96,8 @@ move2Left = False
 move2Right = False
 move2Up = False
 move2Down = False
-
+#the movement speed of the paddles
+AIMOVESPEED = 10
 MOVESPEED = 10
 
 #plays background music
@@ -117,6 +118,19 @@ while GameRunning:
     # Causes the ball to move
     sprite_list.update()
 
+    # AI controls the paddle
+    if ball.rect.y < AI.top:
+        move1Up = True
+        move1Down = False
+    elif ball.rect.y > AI.bottom:
+        move1Up = False
+        move1Down = True
+    if ball.rect.x < AITop.left:
+        move1Left = True
+        move1Right = False
+    elif ball.rect.x > AITop.right:
+        move1Left = False
+        move1Right = True
 
     # Detect collisions between the ball and the paddles
     if AI.colliderect(ball) or player1.colliderect(ball):
@@ -203,7 +217,7 @@ while GameRunning:
                         elif event.type == KEYDOWN and event.key == K_ESCAPE:
                             GameRunning = False
                             sys.exit()
-        ball.resetball1(randint(1, 8), randint(-8,8))
+        ball.resetball1(randint(-8, -1), randint(-8,8))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -214,13 +228,20 @@ while GameRunning:
                 GameRunning = False #Breaks the while
                 sys.exit()
 
-            #I and O will affect the speed of the paddles
-            if event.key == K_i:
+            #I and O will affect the speed of the player's paddles
+            if event.key == K_o:
                 if 10 <= MOVESPEED < 20:
                     MOVESPEED += 1
-            if event.key == K_o:
+            if event.key == K_i:
                 if MOVESPEED > 10:
                     MOVESPEED -= 1
+            #Z and X will affect the AI paddle speed
+            if event.key == K_x:
+                if 1 <= AIMOVESPEED < 20:
+                    AIMOVESPEED += 1
+            if event.key == K_z:
+                if AIMOVESPEED > 1:
+                    AIMOVESPEED -= 1
         #P will pause the game
         if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
             while True:
@@ -228,23 +249,8 @@ while GameRunning:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                     break #unpauses the game
 
-
     #Controls the movement of the paddles
         if event.type == KEYDOWN:
-            #player 1
-            if event.key ==K_w:
-                move1Up = True
-                move1Down = False
-            if event.key == K_a:
-                move1Left = True
-                move1Right = False
-            if event.key ==K_s:
-                move1Up = False
-                move1Down = True
-            if event.key == K_d:
-                move1Left = False
-                move1Right = True
-
             #player 2
             if event.key == K_UP:
                 move2Up = True
@@ -259,16 +265,6 @@ while GameRunning:
                 move2Left = True
                 move2Right = False
         if event.type == KEYUP:
-            #player 1
-            if event.key == K_w:
-                move1Up = False
-            if event.key == K_a:
-                move1Left = False
-            if event.key == K_s:
-                move1Down = False
-            if event.key == K_d:
-                move1Right = False
-
             #player 2
             if event.key == K_UP:
                 move2Up = False
@@ -284,19 +280,19 @@ while GameRunning:
 
     #Moves player 1 main paddle.
     if move1Down and AI.bottom < WINDOWHEIGHT:
-        AI.top += MOVESPEED
+        AI.top += AIMOVESPEED
     if move1Up and AI.top > 0:
-        AI.top -= MOVESPEED
+        AI.top -= AIMOVESPEED
     #moves player 1's top paddle
     if move1Left and AITop.left > 0:
-        AITop.left -= MOVESPEED
+        AITop.left -= AIMOVESPEED
     if move1Right and AITop.right < WINDOWWIDTH/2:
-        AITop.right += MOVESPEED
+        AITop.right += AIMOVESPEED
     #moves player 1's bottom paddle
     if move1Left and AIBottom.left > 0:
-        AIBottom.left -= MOVESPEED
+        AIBottom.left -= AIMOVESPEED
     if move1Right and AIBottom.right < WINDOWWIDTH / 2:
-        AIBottom.right += MOVESPEED
+        AIBottom.right += AIMOVESPEED
 
     #Moves player
     if move2Down and player1.bottom < WINDOWHEIGHT:
