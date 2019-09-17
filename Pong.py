@@ -71,9 +71,9 @@ player1StretchedTBImage = pygame.transform.scale(player1TBimage, (100, 10))
 player1Bottom = pygame.Rect(WINDOWWIDTH - 250, WINDOWHEIGHT - 20, 100, 10)
 
 #Ball
-ball = Ball(WHITE, 30, 30)
+ball = Ball(WHITE, 22, 22)
 ballimage = pygame.image.load('images/kirby.png').convert_alpha()
-ballStretchedimage = pygame.transform.scale(ballimage, (30, 30))
+ballStretchedimage = pygame.transform.scale(ballimage, (22, 22))
 ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
 #Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
