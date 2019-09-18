@@ -5,30 +5,51 @@ import random
 from random import randint
 from pygame.locals import *
 
-#set up the pygame
+# set up the pygame
 pygame.init()
 mainClock = pygame.time.Clock()
 
-#Sets up the window
+# Sets up the window
 WINDOWWIDTH = 800
 WINDOWHEIGHT = 500
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption('Pong With No Walls')
 
-#Setting up the colors
+# Setting up the colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-#Set up the ball class
+# draws the net
+def drawNet(surf, color, start, end, width = 1, length = 10):
+    x1, y1 = start
+    x2, y2 = end
+    distance = length
+
+    if (x1 == x2):
+        ycoordinate = [y for y in range(y1, y2, distance if y1 < y2 else -distance)]
+        xcoordinate = [x1] * len(ycoordinate)
+    else:
+        xcoordinate = [x for x in range(x1, x2, distance if x1 < x2 else -distance)]
+        ycoordinate = [y1] * len(xcoordinate)
+
+    next_coordinate = list(zip(xcoordinate[1::2], ycoordinate[1::2]))
+    last_coordinate = list(zip(xcoordinate[0::2], ycoordinate[0::2]))
+    for (x1, y1), (x2, y2) in zip(next_coordinate, last_coordinate):
+        start = (round(x1), round(y1))
+        end = (round(x2), round(y2))
+        pygame.draw.line(surf, color, start, end, width)
+
+# Set up the ball class
 class Ball(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
-        super().__init__() #calling the parent constructor
+        super().__init__()
+        # calling the parent constructor
 
         self.image = pygame.Surface([width, height])
         self.image.fill(BLACK)
         self.image.set_colorkey(BLACK)
 
-        #draw the ball
+        # draw the ball
         pygame.draw.rect(self.image, color, [0, 0, width, height])
         self.velocity = [randint(-8, 8), randint(-8, 8)]
 
@@ -51,10 +72,10 @@ class Ball(pygame.sprite.Sprite):
         ball.rect.y = (WINDOWHEIGHT / 2) - 10
         self.velocity = [horizontal, vertical]
 
-#Sound files
+# Sound files
 _Sound = ['sounds/blip1.wav', 'sounds/blip2.wav', 'sounds/blip3.wav']
 
-#Set up the player and ball
+# Set up the player and ball
 AI = pygame.Rect(10, (WINDOWHEIGHT/2) - 50, 10, 100)
 AIimage = pygame.image.load('images/AIpaddle.png')
 AIStretchedimage = pygame.transform.scale(AIimage, (10, 100))
@@ -62,7 +83,7 @@ AITop = pygame.Rect(150, 10, 100, 10)
 AITBimage = pygame.image.load('images/AIpaddle.png')
 AIStretchedTBimage = pygame.transform.scale(AITBimage, (100, 10))
 AIBottom = pygame.Rect(150, WINDOWHEIGHT - 20, 100, 10)
-#Player
+# Player
 player1 = pygame.Rect(WINDOWWIDTH - 20, (WINDOWHEIGHT/2) - 50, 10, 100)
 player1image = pygame.image.load('images/playerPaddle.png')
 player1StretchedImage = pygame.transform.scale(player1image, (10, 100))
@@ -70,41 +91,41 @@ player1Top = pygame.Rect(WINDOWWIDTH - 250, 10, 100, 10)
 player1TBimage = pygame.image.load('images/playerTB.png')
 player1StretchedTBImage = pygame.transform.scale(player1TBimage, (100, 10))
 player1Bottom = pygame.Rect(WINDOWWIDTH - 250, WINDOWHEIGHT - 20, 100, 10)
-#Ball
+# Ball
 ball = Ball(WHITE, 22, 22)
 ballimage = pygame.image.load('images/kirby.png').convert_alpha()
 ballStretchedimage = pygame.transform.scale(ballimage, (22, 22))
 ball.rect.x = (WINDOWWIDTH/2) - 10
 ball.rect.y = (WINDOWHEIGHT/2) - 10
-#Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
+# Scores, have 11 scores will add 1 to gameScore. 3 gameScores will prompt winner or loser
 score1 = 0
 score2 = 0
 gameScore1 = 0
 gameScore2 = 0
 
-#adds to sprite list
+# adds to sprite list
 sprite_list = pygame.sprite.Group()
 sprite_list.add(ball)
 
-#Set up the movements for AI
+# Set up the movements for AI
 move1Left = False
 move1Right = False
 move1Up = False
 move1Down = False
-#Seet up the movements for the player
+# Seet up the movements for the player
 move2Left = False
 move2Right = False
 move2Up = False
 move2Down = False
-#the movement speed of the paddles
+# the movement speed of the paddles
 AIMOVESPEED = 10
 MOVESPEED = 10
 
-#plays background music
+# plays background music
 pygame.mixer.music.load('music/Peace And Tranquility.mp3')
 pygame.mixer.music.play()
 
-#loser and winner text
+# loser and winner text
 LoseWinSize = pygame.font.Font(None, 74)
 losertext = LoseWinSize.render("You Lost!",1, WHITE)
 winnertext = LoseWinSize.render("You Won!", 1, WHITE)
@@ -112,7 +133,7 @@ continueFont = pygame.font.Font(None, 30)
 playAgain = continueFont.render("Would you like to play again?", 1, WHITE)
 instructionText = continueFont.render("Press Y to continue or Esc to quit", 1, WHITE)
 
-#Run the game loop
+# Run the game loop
 GameRunning = True
 while GameRunning:
     # Causes the ball to move
@@ -139,7 +160,7 @@ while GameRunning:
         move1Right = False
 
 
-    # Detect collisions between the ball and the paddles
+# Detect collisions between the ball and the paddles
     if AI.colliderect(ball) or player1.colliderect(ball):
         ball.bounce()
         effect = pygame.mixer.Sound(random.choice(_Sound))
@@ -175,7 +196,8 @@ while GameRunning:
                 gameLostMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
-                pygame.display.flip() #updates the screen to show the text
+                pygame.display.flip()
+                # updates the screen to show the text
                 while AIWin:
                     for event in pygame.event.get():
                         if event.type == KEYDOWN and event.key == K_y:
@@ -212,7 +234,8 @@ while GameRunning:
                 gameWonMusic.play()
                 windowSurface.blit(playAgain, (WINDOWWIDTH / 2 - 130, WINDOWHEIGHT / 2))
                 windowSurface.blit(instructionText, (WINDOWWIDTH / 2 - 150, WINDOWHEIGHT / 2 + 30))
-                pygame.display.flip()  # updates the screen to show the text
+                pygame.display.flip()
+                # updates the screen to show the text
                 while AIWin:
                     for event in pygame.event.get():
                         if event.type == KEYDOWN and event.key == K_y:
@@ -228,37 +251,39 @@ while GameRunning:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            GameRunning = False #breaks the while
+            # Breaks the loop
+            GameRunning = False
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                GameRunning = False #Breaks the while
+                GameRunning = False
+                # Breaks the while
                 sys.exit()
 
-            #I and O will affect the speed of the player's paddles
+            # I and O will affect the speed of the player's paddles
             if event.key == K_o:
                 if 10 <= MOVESPEED < 20:
                     MOVESPEED += 1
             if event.key == K_i:
                 if MOVESPEED > 10:
                     MOVESPEED -= 1
-            #Z and X will affect the AI paddle speed
+            # Z and X will affect the AI paddle speed
             if event.key == K_x:
                 if 1 <= AIMOVESPEED < 20:
                     AIMOVESPEED += 1
             if event.key == K_z:
                 if AIMOVESPEED > 1:
                     AIMOVESPEED -= 1
-        #P will pause the game
+        # P will pause the game
         if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
             while True:
                 event = pygame.event.wait()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                    break #unpauses the game
+                    break # unpauses the game
 
-    #Controls the movement of the paddles
+    # Controls the movement of the paddles
         if event.type == KEYDOWN:
-            #player 2
+            # player 2
             if event.key == K_UP:
                 move2Up = True
                 move2Down = False
@@ -272,7 +297,7 @@ while GameRunning:
                 move2Left = True
                 move2Right = False
         if event.type == KEYUP:
-            #player 2
+            # player 2
             if event.key == K_UP:
                 move2Up = False
             if event.key == K_RIGHT:
@@ -282,42 +307,42 @@ while GameRunning:
             if event.key == K_LEFT:
                 move2Left = False
 
-    #Draws the background onto the surface
+    # Draws the background onto the surface
     windowSurface.fill(BLACK)
 
-    #Moves player 1 main paddle.
+    # Moves player 1 main paddle.
     if move1Down and AI.bottom < WINDOWHEIGHT:
         AI.top += AIMOVESPEED
     if move1Up and AI.top > 0:
         AI.top -= AIMOVESPEED
-    #moves player 1's top paddle
+    # moves player 1's top paddle
     if move1Left and AITop.left > 0:
         AITop.left -= AIMOVESPEED
     if move1Right and AITop.right < WINDOWWIDTH/2:
         AITop.right += AIMOVESPEED
-    #moves player 1's bottom paddle
+    # moves player 1's bottom paddle
     if move1Left and AIBottom.left > 0:
         AIBottom.left -= AIMOVESPEED
     if move1Right and AIBottom.right < WINDOWWIDTH / 2:
         AIBottom.right += AIMOVESPEED
 
-    #Moves player
+    # Moves player
     if move2Down and player1.bottom < WINDOWHEIGHT:
         player1.top += MOVESPEED
     if move2Up and player1.top > 0:
         player1.top -= MOVESPEED
-    #moves player's top paddle
+    # moves player's top paddle
     if move2Left and player1Top.left > WINDOWWIDTH/2:
         player1Top.left -= MOVESPEED
     if move2Right and player1Top.right < WINDOWWIDTH:
         player1Top.right += MOVESPEED
-    #moves player's bottom paddle
+    # moves player's bottom paddle
     if move2Left and player1Bottom.left > WINDOWWIDTH/2:
         player1Bottom.left -= MOVESPEED
     if move2Right and player1Bottom.right < WINDOWWIDTH:
         player1Bottom.right += MOVESPEED
 
-    #Draw the player onto surface
+    # Draw the player onto surface
     windowSurface.blit(AIStretchedimage, AI)
     windowSurface.blit(AIStretchedTBimage, AITop)
     windowSurface.blit(AIStretchedTBimage, AIBottom)
@@ -327,7 +352,7 @@ while GameRunning:
     windowSurface.blit(ballStretchedimage, ball)
 
 
-    # Display scores:
+# Display scores:
     font = pygame.font.Font(None, 60)
     scoreMessage = font.render(str(score1), 1, WHITE)
     windowSurface.blit(scoreMessage, (WINDOWWIDTH/2 - 80, 10))
@@ -344,10 +369,11 @@ while GameRunning:
     elif gameScore2 == 2:
         windowSurface.blit(score2Message, (WINDOWWIDTH/2 + 10, 10))
 
-    #Draw the net
-    pygame.draw.line(windowSurface, WHITE, [(WINDOWWIDTH/2) - 1, 0], [(WINDOWWIDTH/2) - 1, WINDOWHEIGHT])
+    # Draw the net
+    drawNet(windowSurface, WHITE, [(WINDOWWIDTH/2) - 1, 0], [(WINDOWWIDTH/2) - 1, WINDOWHEIGHT])
+    # pygame.draw.line(windowSurface, WHITE, [(WINDOWWIDTH/2) - 1, 0], [(WINDOWWIDTH/2) - 1, WINDOWHEIGHT])
 
-    #Draw the window onto the screen
+    # Draw the window onto the screen
     pygame.display.flip()
     mainClock.tick(30)
 
