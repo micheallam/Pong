@@ -123,6 +123,7 @@ MOVESPEED = 10
 
 # plays background music
 pygame.mixer.music.load('music/Peace And Tranquility.mp3')
+pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play()
 
 # loser and winner text
@@ -164,12 +165,14 @@ while GameRunning:
     if AI.colliderect(ball) or player1.colliderect(ball):
         ball.bounce()
         effect = pygame.mixer.Sound(random.choice(_Sound))
+        effect.set_volume(0.2)
         effect.play()
 
     if AITop.colliderect(ball) or AIBottom.colliderect(ball) or player1Top.colliderect(ball) or \
             player1Bottom.colliderect(ball):
         ball.bouncehorizontal()
         effect = pygame.mixer.Sound(random.choice(_Sound))
+        effect.set_volume(0.2)
         effect.play()
 
     # Adds to the score when a player scores
@@ -177,9 +180,9 @@ while GameRunning:
     if ball.rect.x >= WINDOWWIDTH - 10 or ball.rect.y <= 10 and ball.rect.x > WINDOWWIDTH / 2 or \
             ball.rect.y >= WINDOWHEIGHT - 10 and ball.rect.x > WINDOWWIDTH / 2:
         score1 += 1
-        if (score1 - 1) <= score2 or (score1 - 1) >= score2:
-            pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
-            pointSound.play()
+        pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
+        pointSound.set_volume(1)
+        pointSound.play()
         if score1 >= 11 and (score1 - 2) >= score2:
             gameScore1 += 1
             if gameScore1 < 3:
@@ -215,9 +218,9 @@ while GameRunning:
     if ball.rect.x <= 10 or ball.rect.y >= WINDOWHEIGHT - 10 and ball.rect.x < WINDOWWIDTH / 2 or \
             ball.rect.y <= 10 and ball.rect.x < WINDOWWIDTH / 2:
         score2 += 1
-        if (score2 - 1) <= score1 or (score2 - 1) >= score1:
-            pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
-            pointSound.play()
+        pointSound = pygame.mixer.Sound("sounds/UMU.ogg")
+        pointSound.set_volume(1)
+        pointSound.play()
         if score2 >= 11 and (score2 - 2) >= score1:
             gameScore2 += 1
             if gameScore2 < 3:
